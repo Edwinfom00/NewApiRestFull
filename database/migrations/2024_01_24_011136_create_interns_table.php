@@ -13,17 +13,18 @@ return new class extends Migration
     {
         Schema::create('interns', function (Blueprint $table) {
             $table->id();
-            $table->string('user_id');
-            $table->string('company_id');
+            $table->integer('user_id');
+            $table->integer('company_id');
             $table->string('title');
             $table->string('slug');
             $table->text('description');
             $table->text('roles');
-            $table->integer('category_id');
+            // $table->integer('category_id');
             $table->string('position');
             $table->string('address');
             $table->integer('featured');
             $table->string('type');
+            // ['fulltime','parttime','contract','internship'];
             $table->integer('status');
             $table->date('last_date');
             $table->timestamps();

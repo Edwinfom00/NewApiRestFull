@@ -22,6 +22,12 @@ class InternFormRequest extends FormRequest
     public function rules(): array
     {
         return [
+            "user_id "=>['integer', "max:10"],
+             "company_id" => ['integer', "max:10"] ,
+             "slug"=>['string', "max:250"],
+            // "category_id" => 2,
+            "featured" => ['integer', "max:10"],
+            "status"=> ['integer', "max:10"],
             'title'=> 'required|max:150',
             'position'=> 'required|max:255',
             'description'=> 'required|max:5000',
