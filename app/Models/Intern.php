@@ -8,19 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 class Intern extends Model
 {
 
-  protected  $fillable =[
-    'title',
-   'position',
-   'description',
-    'roles',
-   'address',
-   'type',
-   'last_date'
-  ];
-
-
-
-
-
+    protected $guarded  = [];
     use HasFactory;
 }
