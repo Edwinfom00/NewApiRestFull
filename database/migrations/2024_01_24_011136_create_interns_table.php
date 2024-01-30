@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('slug');
             $table->text('description');
             $table->text('roles');
-            // $table->integer('category_id');
+            $table->integer('category_id');
             $table->string('position');
             $table->string('address');
             $table->integer('featured');

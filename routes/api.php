@@ -24,15 +24,38 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 //Route to manage Intern
 
-Route::get('/intern', [InternController::class,'index']);
-Route::post('/intern', [InternController::class, 'store']);
-Route::get('/intern/{intern}', [InternController::class, 'show']);
-Route::put('/intern/{intern}', [InternController::class, 'update']);
-Route::delete('/intern/{intern}', [InternController::class, 'destroy']);
+Route::middleware('auth:sanctum')->group(function () {
+    // Home Routes
+    Route::get('/', [InternController::class, 'index']);
+    Route::get('/home', [InternController::class, 'index'])->name('home');
+    Route::post('/interns', [InternController::class, 'store'])->name('intern.store');
+    Route::put('/interns/{id}', [InternController::class, 'update'])->name('intern.update');
+    Route::delete('/interns/{id}', [InternController::class, 'destroy'])->name('intern.destroy');
+    Route::get('/interns/{id}', [InternController::class, 'show'])->name('intern.show');
 
-//Route to manage Company
-Route::get('/company',[CompanyController::class, 'index']);
-Route::post('/company',[CompanyController::class, 'store']);
-Route::get('/company/{company}',[CompanyController::class, 'show']);
-Route::put('/company/{company}',[CompanyController::class, 'update']);
-Route::delete('/company/{company}',[CompanyController::class, 'delete']);
+    // Applicant
+    Route::post('/applications/{id}', [InternController::class, 'apply'])->name('apply');
+
+
+    // User Profile Routes
+    Route::get('/user/profile', [UserProfileController::class, 'show'])->name('user.profile');
+    Route::put('/user/profile', [UserProfileController::class, 'update'])->name('user.profile.update');
+    Route::post('/user/profile/coverletter', [UserProfileController::class, 'updateCoverLetter'])->name('user.profile.coverletter');
+    Route::post('/user/profile/resume', [UserProfileController::class, 'updateResume'])->name('user.profile.resume');
+    Route::post('/user/profile/avatar', [UserProfileController::class, 'updateAvatar'])->name('user.profile.avatar');
+});
+
+// Company Routes
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/companies', [CompanyController::class, 'index'])->name('companies.index');
+    Route::post('/companies', [CompanyController::class, 'store'])->name('companies.store');
+    Route::put('/companies/{id}', [CompanyController::class, 'update'])->name('companies.update');
+    Route::delete('/companies/{id}', [CompanyController::class, 'destroy'])->name('companies.destroy');
+    Route::get('/companies/{id}', [CompanyController::class, 'show'])->name('companies.show');
+});
+
+
+// Favorite Routes
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/favorites/{id}', [FavoriteController::class, 'toggleFavorite'])->name('favorites.toggle');
+});
