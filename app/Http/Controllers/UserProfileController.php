@@ -79,5 +79,69 @@ class UserProfileController extends Controller
         }
     }
 
+
+
     // Méthodes similaires pour la mise à jour du CV, de l'avatar et d'autres fonctionnalités...
+
+    public function updateResume(Request $request)
+    {
+        $user_id = auth()->user()->id;
+
+        $request->validate([
+            'resume'=>'required|mimes:pdf|max:2048',
+        ]);
+
+        try {
+            // Supprime l'ancienne Cv le cas échéant
+            $oldResume = Profile::where('user_id', $user_id)->value('resume');
+            if ($oldResume) {
+                Storage::delete($oldResume);
+            }
+
+            // Stocke la nouveau CV dans le système de fichiers
+            $resume = $request->file('resume')->store('public/files');
+            Profile::where('user_id', $user_id)->update(['resume' => $resume]);
+
+            // Retourne une réponse JSON avec un message de succès
+            return response()->json(['message' => 'CV mis à jour avec succès.'], 200);
+
+        } catch (\Exception $e) {
+            // Retourne une réponse JSON avec un message d'erreur en cas d'échec
+            return response()->json(['error' => 'Une erreur s\'est produite lors du téléchargement du fichier.'], 500);
+        }
+    }
+
+    public function updateAvatar(Request $request)
+    {
+        $user_id = auth()->user()->id;
+
+        $request->validate([
+            'avatar' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+        ]);
+
+        try {
+            $oldAvatar = Profile::where('user_id', $user_id)->value('avatar');
+
+            // Déterminer si l'image provient d'un fichier ou d'une URL
+            if ($request->hasFile('avatar')) {
+                $avatar = $request->file('avatar');
+            } else {
+                // Gérer l'image provenant d'une URL (non abordé ici)
+            }
+
+            if ($oldAvatar && Storage::exists('public/avatars/' . $oldAvatar)) {
+                Storage::delete('public/avatars/' . $oldAvatar);
+            }
+
+            // Stocker l'image
+            $newAvatarPath = $avatar->store('public/avatars');
+
+            // Mettre à jour la base de données
+            Profile::where('user_id', $user_id)->update(['avatar' => $newAvatarPath]);
+
+            return response()->json(['message' => 'Avatar mis à jour avec succès.'], 200);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Une erreur s\'est produite lors du téléchargement du fichier.'], 500);
+        }
+    }
 }

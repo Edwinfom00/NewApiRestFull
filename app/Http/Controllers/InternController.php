@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\InternPostRequest;
+use App\Http\Requests\InternFormRequest;
 use App\Models\Category;
 use App\Models\Company;
 use App\Models\Intern;
@@ -44,7 +44,7 @@ class InternController extends Controller
     /**
      * Stocker une nouvelle ressource créée dans la base de donnee
      */
-    public function store(InternPostRequest $request)
+    public function store(InternFormRequest $request)
     {
         $user_id = auth()->user()->id;
         $company = Company::where('user_id', $user_id)->first();
