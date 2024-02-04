@@ -2,10 +2,12 @@
 
 use App\Http\Controllers\Api\Auth\LoginController;
 use App\Http\Controllers\Api\Auth\RegisterController;
+use App\Http\Controllers\Api\Auth\ResetPasswordController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\InternController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+
 
 
 
@@ -31,6 +33,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/register', [RegisterController::class, 'register'])->name('register');
     Route::post('/login', [LoginController::class, 'login'])->name('login');
     Route::post('/logout',[LoginController::class, 'logout'])->name('logout');
+    Route::post('/resetpassword',[ResetPasswordController::class, 'sendResetLinkEmail']);
+    Route::post('/resetpassword',[ResetPasswordController::class, 'reset']);
 });
 
 
