@@ -3,11 +3,16 @@
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\ResetPasswordController;
+use App\Http\Controllers\Auth\VerificationController;
 use App\Http\Controllers\CompanyController;
+use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\InternController;
 use App\Http\Controllers\UserProfileController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+
+
+
 
 
 
@@ -37,6 +42,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout',[LoginController::class, 'logout'])->name('logout');
     Route::post('/resetpassword',[ResetPasswordController::class, 'sendResetLinkEmail'])->name('sendreset');
     Route::post('/resetpassword',[ResetPasswordController::class, 'reset'])->name('resetpassword');
+    Route::get('/email/verify', [VerificationController::class, 'verify'])->name('verification.verify');
+    Route::post('/email/resend', [VerificationController::class, 'resend'])->name('verification.resend');
 });
 
 
@@ -73,7 +80,8 @@ Route::middleware('auth:sanctum')->group(function () {
 });
 
 
-// Favorite Routes
-// Route::middleware('auth:sanctum')->group(function () {
-//     Route::post('/favorites/{id}', [FavoriteController::class, 'toggleFavorite'])->name('favorites.toggle');
-// });
+//Favorite Routes
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/interns/{id}', [FavoriteController::class, 'saveIntern']);
+    Route::delete('/interns/{id}', [FavoriteController::class, 'unsaveIntern']);
+});
