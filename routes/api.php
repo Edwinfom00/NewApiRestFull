@@ -39,6 +39,7 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/register', [RegisterController::class, 'register'])->name('register');
     Route::post('/login', [LoginController::class, 'login'])->name('login');
+    Route::post('/login/google', [LoginController::class, 'loginWithGoogle'])->name('login.google');
     Route::post('/logout',[LoginController::class, 'logout'])->name('logout');
     Route::post('/resetpassword',[ResetPasswordController::class, 'sendResetLinkEmail'])->name('sendreset');
     Route::post('/resetpassword',[ResetPasswordController::class, 'reset'])->name('resetpassword');
