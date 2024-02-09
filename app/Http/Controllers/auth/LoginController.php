@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Laravel\Socialite\Facades\Socialite;
 
 class LoginController extends Controller
 {
@@ -33,4 +35,51 @@ class LoginController extends Controller
 
         return response()->json(['message' => 'User logged out successfully'], 200);
     }
+
+    public function loginWithGoogle(Request $request)
+    {
+        try {
+            $user = Socialite::driver('google')->user();
+
+            // Vérifiez si l'utilisateur existe dans votre base de données
+
+            $existingUser = User::where('email', $user->email)->first();
+
+            if ($existingUser) {
+                // Générez un token d'API pour l'utilisateur
+                $token = $existingUser->createToken('api-token');
+
+                return response()->json([
+                    'success' => true,
+                    'token' => $token->plainTextToken,
+                    'user' => $existingUser,
+                ]);
+            } else {
+                // Créez un nouvel utilisateur
+                $newUser = User::create([
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'google_id' => $user->id,
+                    'password' => bcrypt('password'),
+                ]);
+
+                // Générez un token d'API pour l'utilisateur
+                $token = $newUser->createToken('api-token');
+
+                return response()->json([
+                    'success' => true,
+                    'token' => $token->plainTextToken,
+                    'user' => $newUser,
+                ]);
+            }
+
+        } catch (Exception $e) {
+            // Gérer l'erreur
+            return response()->json([
+                'success' => false,
+                'message' => 'Une erreur est survenue lors de la connexion avec Google.',
+            ], 400);
+        }
+    }
+
 }
