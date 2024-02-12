@@ -15,10 +15,11 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('user_type');
-            $table->string('google_id');
+            $table->string('google_id')->nullable();
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->string('status');
             $table->rememberToken();
             $table->timestamps();
         });

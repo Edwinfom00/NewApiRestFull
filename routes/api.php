@@ -1,9 +1,9 @@
 <?php
 
-use App\Http\Controllers\Auth\LoginController;
-use App\Http\Controllers\Auth\RegisterController;
-use App\Http\Controllers\Auth\ResetPasswordController;
-use App\Http\Controllers\Auth\VerificationController;
+use App\Http\Controllers\LoginController;
+use App\Http\Controllers\RegisterController;
+use App\Http\Controllers\ResetPasswordController;
+use App\Http\Controllers\VerificationController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\InternController;
@@ -36,7 +36,6 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 //Route to do Registration
-Route::middleware('auth:sanctum')->group(function () {
     Route::post('/register', [RegisterController::class, 'register'])->name('register');
     Route::post('/login', [LoginController::class, 'login'])->name('login');
     Route::post('/login/google', [LoginController::class, 'loginWithGoogle'])->name('login.google');
@@ -45,7 +44,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/resetpassword',[ResetPasswordController::class, 'reset'])->name('resetpassword');
     Route::get('/email/verify', [VerificationController::class, 'verify'])->name('verification.verify');
     Route::post('/email/resend', [VerificationController::class, 'resend'])->name('verification.resend');
-});
 
 
 //Route to manage Intern

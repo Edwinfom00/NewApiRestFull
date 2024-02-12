@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Auth;
+namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\Profile;
@@ -13,11 +13,13 @@ class RegisterController extends Controller
 {
     public function register(Request $request)
     {
+        $userTypes = ['user', 'university', 'company'];
+
         $validator = Validator::make($request->all(), [
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],  // Added confirmation
-            'user_type' => ['required', 'string', 'in:user,admin'],  // Added type validation
+            'password' => ['required', 'string', 'min:8'],  // Added confirmation
+            'user_type' => ['required','string'], // Added type validation
         ]);
 
         if ($validator->fails()) {
@@ -32,11 +34,11 @@ class RegisterController extends Controller
             'status' => 1,
         ]);
 
-        Profile::create([
-            'user_id' => $user->id,
-            'gender' => $request->gender,
-            'dob' => $request->dob,
-        ]);
+        // Profile::create([
+        //     'user_id' => $user->id,
+        //     'gender' => $request->gender,
+        //     'dob' => $request->dob,
+        // ]);
 
         return response()->json($user, 201);
     }
