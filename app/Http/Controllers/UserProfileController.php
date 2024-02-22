@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Profile;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use App\Http\Controllers\Controller;
 
 class UserProfileController extends Controller
 {
@@ -16,6 +15,7 @@ class UserProfileController extends Controller
     {
         // Récupère le profil de l'utilisateur en fonction de l'identifiant utilisateur
         $profile = Profile::where('user_id', $user_id)->first();
+
         return response()->json(['profile' => $profile], 200);
     }
 
@@ -29,16 +29,19 @@ class UserProfileController extends Controller
         // Validation des données envoyées dans la requête
         $request->validate([
             'address' => 'required|min:20|max:255',
-            'phone'=> 'required|digits:11',
-            'bio'=> 'required|min:30|max:450',
+            'phone' => 'required|digits:11',
+            'bio' => 'required|min:30|max:1000',
+            'gender' => 'required|min:5|max:12',
         ]);
 
         // Met à jour les informations du profil dans la base de données
         Profile::where('user_id', $user_id)->update([
-            'address'=> $request->address,
-            'phone'=> $request->phone,
-            'experience'=> $request->experience,
-            'bio'=> $request->bio,
+            'name' => $request->name,
+            'address' => $request->address,
+            'phone' => $request->phone,
+            'experience' => $request->experience,
+            'bio' => $request->bio,
+            'gender' => $request->gender,
         ]);
 
         // Retourne une réponse JSON avec un message de succès
@@ -54,7 +57,7 @@ class UserProfileController extends Controller
 
         // Validation des données envoyées dans la requête
         $request->validate([
-            'cover_letter'=>'required|mimes:pdf|max:1024',
+            'cover_letter' => 'required|mimes:pdf|max:1024',
         ]);
 
         try {
@@ -68,7 +71,7 @@ class UserProfileController extends Controller
             $coverLetter = $request->file('cover_letter')->store('public/files');
             // Met à jour le chemin de la lettre de motivation dans la base de données
             Profile::where('user_id', $user_id)->update([
-                'cover_letter' => $coverLetter
+                'cover_letter' => $coverLetter,
             ]);
 
             // Retourne une réponse JSON avec un message de succès
@@ -79,8 +82,6 @@ class UserProfileController extends Controller
         }
     }
 
-
-
     // Méthodes similaires pour la mise à jour du CV, de l'avatar et d'autres fonctionnalités...
 
     public function updateResume(Request $request)
@@ -88,7 +89,7 @@ class UserProfileController extends Controller
         $user_id = auth()->user()->id;
 
         $request->validate([
-            'resume'=>'required|mimes:pdf|max:2048',
+            'resume' => 'required|mimes:pdf|max:2048',
         ]);
 
         try {
@@ -129,8 +130,8 @@ class UserProfileController extends Controller
                 // Gérer l'image provenant d'une URL (non abordé ici)
             }
 
-            if ($oldAvatar && Storage::exists('public/avatars/' . $oldAvatar)) {
-                Storage::delete('public/avatars/' . $oldAvatar);
+            if ($oldAvatar && Storage::exists('public/avatars/'.$oldAvatar)) {
+                Storage::delete('public/avatars/'.$oldAvatar);
             }
 
             // Stocker l'image

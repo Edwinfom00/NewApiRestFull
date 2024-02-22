@@ -1,24 +1,15 @@
 <?php
 
-use App\Http\Controllers\LoginController;
-use App\Http\Controllers\RegisterController;
-use App\Http\Controllers\ResetPasswordController;
-use App\Http\Controllers\VerificationController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\InternController;
+use App\Http\Controllers\LoginController;
+use App\Http\Controllers\RegisterController;
+use App\Http\Controllers\ResetPasswordController;
 use App\Http\Controllers\UserProfileController;
+use App\Http\Controllers\VerificationController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-
-
-
-
-
-
-
-
-
 
 /*
 |--------------------------------------------------------------------------
@@ -36,15 +27,14 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 });
 
 //Route to do Registration
-    Route::post('/register', [RegisterController::class, 'register'])->name('register');
-    Route::post('/login', [LoginController::class, 'login'])->name('login');
-    Route::post('/login/google', [LoginController::class, 'loginWithGoogle'])->name('login.google');
-    Route::post('/logout',[LoginController::class, 'logout'])->name('logout');
-    Route::post('/resetpassword',[ResetPasswordController::class, 'sendResetLinkEmail'])->name('sendreset');
-    Route::post('/resetpassword',[ResetPasswordController::class, 'reset'])->name('resetpassword');
-    Route::get('/email/verify', [VerificationController::class, 'verify'])->name('verification.verify');
-    Route::post('/email/resend', [VerificationController::class, 'resend'])->name('verification.resend');
-
+Route::post('/register', [RegisterController::class, 'register'])->name('register');
+Route::post('/login', [LoginController::class, 'login'])->name('login');
+Route::post('/login/google', [LoginController::class, 'loginWithGoogle'])->name('login.google');
+Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+Route::post('/resetpassword', [ResetPasswordController::class, 'sendResetLinkEmail'])->name('sendreset');
+Route::post('/resetpassword', [ResetPasswordController::class, 'reset'])->name('resetpassword');
+Route::get('/email/verify', [VerificationController::class, 'verify'])->name('verification.verify');
+Route::post('/email/resend', [VerificationController::class, 'resend'])->name('verification.resend');
 
 //Route to manage Intern
 
@@ -52,6 +42,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Home Routes
     Route::get('/', [InternController::class, 'index']);
     Route::get('/home', [InternController::class, 'index'])->name('home');
+
     Route::post('/interns', [InternController::class, 'store'])->name('intern.store');
     Route::put('/interns/{id}', [InternController::class, 'update'])->name('intern.update');
     Route::delete('/interns/{id}', [InternController::class, 'destroy'])->name('intern.destroy');
@@ -59,7 +50,6 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Applicant
     Route::post('/applications/{id}', [InternController::class, 'apply'])->name('apply');
-
 
     // User Profile Routes
     Route::get('/user/profile', [UserProfileController::class, 'show'])->name('user.profile');
@@ -77,7 +67,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/companies/{id}', [CompanyController::class, 'destroy'])->name('companies.destroy');
     Route::get('/companies/{id}', [CompanyController::class, 'show'])->name('companies.show');
 });
-
 
 //Favorite Routes
 Route::middleware('auth:sanctum')->group(function () {

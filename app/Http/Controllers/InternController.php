@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use App\Http\Requests\InternFormRequest;
 use App\Models\Category;
 use App\Models\Company;
@@ -15,12 +14,10 @@ use Illuminate\Support\Str;
 
 class InternController extends Controller
 {
-
     public function __construct()
     {
-        $this->middleware(['employer','verified'], ['except'=> ['index', 'show', 'apply', 'allInterns', 'category', 'searchInterns']]);
+        $this->middleware(['employer', 'verified'], ['except' => ['index', 'show', 'apply', 'allInterns', 'category', 'searchInterns']]);
     }
-
 
     /**
      * Afficher une liste des ressources.
@@ -38,9 +35,10 @@ class InternController extends Controller
             'companies' => $companies,
             'posts' => $posts,
             'testimonial' => $testimonial,
-            'categories' => $categories
+            'categories' => $categories,
         ], 200);
     }
+
     /**
      * Stocker une nouvelle ressource créée dans la base de donnee
      */
@@ -51,8 +49,8 @@ class InternController extends Controller
         $company_id = $company->id;
 
         $intern = Intern::create([
-            'user_id'=> $user_id,
-            'company_id'=> $company_id,
+            'user_id' => $user_id,
+            'company_id' => $company_id,
             'title' => request('title'),
             'slug' => Str::slug(request('title')),
             'description' => request('description'),
@@ -71,28 +69,28 @@ class InternController extends Controller
     /**
      * Afficher tous les stages.
      */
-    public function allInterns(Request $request )
+    public function allInterns(Request $request)
     {
         $title = $request->get('title');
         $type = $request->get('type');
         $category = $request->get('category_id');
         $address = $request->get('address');
 
-        if($title || $type || $category || $address){
+        if ($title || $type || $category || $address) {
             $interns = Intern::where('title', 'LIKE', '%'.$title.'%')
-            ->orWhere('type', $type)
-            ->orWhere('category_id', $category)
-            ->orWhere('address', $address)
-            ->paginate(25);
+                ->orWhere('type', $type)
+                ->orWhere('category_id', $category)
+                ->orWhere('address', $address)
+                ->paginate(25);
 
             return response()->json(compact('interns'), 200);
-        }else{
+        } else {
 
             $interns = Intern::latest()->paginate(25);
+
             return response()->json(compact('interns'), 200);
         }
     }
-
 
     /**
      * Afficher la ressource spécifique.
@@ -102,39 +100,41 @@ class InternController extends Controller
         $intern = Intern::findOrFail($id);
 
         $internRecommendation = $this->internRecommendation($intern);
+
         return response()->json(compact('intern', 'internRecommendation'), 200);
     }
 
-    public function internRecommendation($intern){
+    public function internRecommendation($intern)
+    {
         $data = [];
 
         // Récupérer les stages basés sur la catégorie du stage donné
         $internsBasedOnCategory = Intern::latest()
-                                ->where('category_id', $intern->category_id)
-                                ->whereDate('last_date', '>', date('Y-m-d'))
-                                ->where('id', '!=', $intern->id)
-                                ->where('status', 1)
-                                ->limit(5)
-                                ->get();
+            ->where('category_id', $intern->category_id)
+            ->whereDate('last_date', '>', date('Y-m-d'))
+            ->where('id', '!=', $intern->id)
+            ->where('status', 1)
+            ->limit(5)
+            ->get();
 
         array_push($data, $internsBasedOnCategory);
 
         // Récupérer les stages basés sur la société du stage donné
         $internsBasedOnCompany = Intern::latest()
-                                ->where('company_id', $intern->company_id)
-                                ->whereDate('last_date', '>', date('Y-m-d'))
-                                ->where('id', '!=', $intern->id)
-                                ->where('status', 1)
-                                ->limit(5)
-                                ->get();
+            ->where('company_id', $intern->company_id)
+            ->whereDate('last_date', '>', date('Y-m-d'))
+            ->where('id', '!=', $intern->id)
+            ->where('status', 1)
+            ->limit(5)
+            ->get();
         array_push($data, $internsBasedOnCompany);
 
         // Récupérer les stages basés sur le poste du stage donné
         $internsBasedOnPosition = Intern::latest()
-                                ->where('position', 'LIKE', '%'.$intern->position.'%')
-                                ->where('status', 1)
-                                ->limit(5)
-                                ->get();
+            ->where('position', 'LIKE', '%'.$intern->position.'%')
+            ->where('status', 1)
+            ->limit(5)
+            ->get();
 
         array_push($data, $internsBasedOnPosition);
 
@@ -156,12 +156,14 @@ class InternController extends Controller
     public function myintern()
     {
         $interns = Intern::where('user_id', auth()->user()->id)->get();
+
         return response()->json(compact('interns'), 200);
     }
 
     public function edit($id)
     {
         $intern = Intern::findOrFail($id);
+
         return response()->json(compact('intern'), 200);
     }
 
@@ -179,18 +181,20 @@ class InternController extends Controller
     /**
      * Méthode d'application de stage.
      */
-    public function apply(Request $request,$id)
+    public function apply(Request $request, $id)
     {
         $intern = Intern::findOrFail($id);
         $intern->users()->attach(Auth::user()->id);
 
         return response()->json(['message' => 'Internship applied Successfully.'], 200);
+
     }
 
     // Méthode de récupération des candidats pour un stage
     public function applicant()
     {
         $applicants = Intern::has('users')->where('user_id', auth()->user()->id)->get();
+
         return response()->json(compact('applicants'), 200);
     }
 
@@ -198,10 +202,11 @@ class InternController extends Controller
     public function searchInterns(Request $request)
     {
         $keyword = $request->get('keyword');
-        $interns = Intern::where('title','like','%'.$keyword.'%')
-                ->orWhere('position','like','%'.$keyword.'%')
-                ->orWhere('address','like','%'.$keyword.'%')
-                ->get();
+        $interns = Intern::where('title', 'like', '%'.$keyword.'%')
+            ->orWhere('position', 'like', '%'.$keyword.'%')
+            ->orWhere('address', 'like', '%'.$keyword.'%')
+            ->get();
+
         return response()->json(compact('interns'), 200);
     }
 
@@ -209,7 +214,7 @@ class InternController extends Controller
     public function internToggle($id)
     {
         $intern = Intern::find($id);
-        $intern->status = !$intern->status;
+        $intern->status = ! $intern->status;
         $intern->save();
 
         return response()->json(['message' => 'Internship Status Updated Successfully!'], 200);
@@ -220,6 +225,7 @@ class InternController extends Controller
     {
         $intern = Intern::find($id);
         $intern->delete();
+
         return response()->json(['message' => 'Internship Deleted Successfully!'], 200);
     }
 }

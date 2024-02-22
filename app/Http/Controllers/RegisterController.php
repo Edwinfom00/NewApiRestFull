@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use App\Models\Profile;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -19,7 +18,7 @@ class RegisterController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8'],  // Added confirmation
-            'user_type' => ['required','string'], // Added type validation
+            'user_type' => ['required', 'string'], // Added type validation
         ]);
 
         if ($validator->fails()) {
@@ -34,11 +33,10 @@ class RegisterController extends Controller
             'status' => 1,
         ]);
 
-        // Profile::create([
-        //     'user_id' => $user->id,
-        //     'gender' => $request->gender,
-        //     'dob' => $request->dob,
-        // ]);
+        Profile::create([
+            'user_id' => $user->id,
+            'name' => $user->name,
+        ]);
 
         return response()->json($user, 201);
     }
