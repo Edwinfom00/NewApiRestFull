@@ -37,7 +37,6 @@ Route::get('/email/verify', [VerificationController::class, 'verify'])->name('ve
 Route::post('/email/resend', [VerificationController::class, 'resend'])->name('verification.resend');
 
 //Route to manage Intern
-
 Route::middleware('auth:sanctum')->group(function () {
     // Home Routes
     Route::get('/', [InternController::class, 'index']);
@@ -52,8 +51,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/applications/{id}', [InternController::class, 'apply'])->name('apply');
 
     // User Profile Routes
-    Route::get('/user/profile', [UserProfileController::class, 'show'])->name('user.profile');
-    Route::put('/user/profile', [UserProfileController::class, 'update'])->name('user.profile.update');
+    Route::get('/user/profile/show', [UserProfileController::class, 'show'])->name('user.profile');
+    Route::put('/user/profile/update', [UserProfileController::class, 'update'])->name('user.profile.update');
+
     Route::post('/user/profile/coverletter', [UserProfileController::class, 'updateCoverLetter'])->name('user.profile.coverletter');
     Route::post('/user/profile/resume', [UserProfileController::class, 'updateResume'])->name('user.profile.resume');
     Route::post('/user/profile/avatar', [UserProfileController::class, 'updateAvatar'])->name('user.profile.avatar');

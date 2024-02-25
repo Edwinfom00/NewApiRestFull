@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -32,6 +31,8 @@ class LoginController extends Controller
     {
         // Revoke user's API token
         $request->user()->token()->revoke();
+
+        session()->forget('user_id');
 
         return response()->json(['message' => 'User logged out successfully'], 200);
     }
@@ -81,5 +82,4 @@ class LoginController extends Controller
             ], 400);
         }
     }
-
 }

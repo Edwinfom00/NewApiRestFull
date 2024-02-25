@@ -28,10 +28,10 @@ class UserProfileController extends Controller
 
         // Validation des données envoyées dans la requête
         $request->validate([
-            'address' => 'required|min:20|max:255',
-            'phone' => 'required|digits:11',
+            'address' => 'required|min:10|max:255',
+            'phone' => 'required|digits:9',
             'bio' => 'required|min:30|max:1000',
-            'gender' => 'required|min:5|max:12',
+            'gender' => 'required',
         ]);
 
         // Met à jour les informations du profil dans la base de données
@@ -39,8 +39,8 @@ class UserProfileController extends Controller
             'name' => $request->name,
             'address' => $request->address,
             'phone' => $request->phone,
-            'experience' => $request->experience,
             'bio' => $request->bio,
+            'dob' => $request->dob,
             'gender' => $request->gender,
         ]);
 
