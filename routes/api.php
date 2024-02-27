@@ -53,10 +53,11 @@ Route::middleware('auth:sanctum')->group(function () {
     // User Profile Routes
     Route::get('/user/profile/show', [UserProfileController::class, 'show'])->name('user.profile');
     Route::put('/user/profile/update', [UserProfileController::class, 'update'])->name('user.profile.update');
+    Route::put('/user/profile/password', [UserProfileController::class, 'updatePassword'])->name('user.profile.update');
 
-    Route::post('/user/profile/coverletter', [UserProfileController::class, 'updateCoverLetter'])->name('user.profile.coverletter');
-    Route::post('/user/profile/resume', [UserProfileController::class, 'updateResume'])->name('user.profile.resume');
-    Route::post('/user/profile/avatar', [UserProfileController::class, 'updateAvatar'])->name('user.profile.avatar');
+    Route::put('/user/profile/coverletter', [UserProfileController::class, 'updateCoverLetter'])->name('user.profile.coverletter');
+    Route::put('/user/profile/resume', [UserProfileController::class, 'updateResume'])->name('user.profile.resume');
+    Route::put('/user/profile/avatar', [UserProfileController::class, 'updateAvatar'])->name('user.profile.avatar');
 });
 
 // Company Routes

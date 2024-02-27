@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Profile;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 
 class UserProfileController extends Controller
@@ -48,6 +50,38 @@ class UserProfileController extends Controller
         return response()->json(['message' => 'Informations du profil mises à jour avec succès.'], 200);
     }
 
+    public function updatePassword(Request $request)
+    {
+        $user = auth()->user();
+
+        // Validation des champs
+        $request->validate([
+            'current_password' => 'required|string|min:8',
+            'new_password' => 'required|string|min:8',
+        ]);
+
+        // Vérification de l'ancien mot de passe
+        if (! Hash::check($request->current_password, $user->password)) {
+            return response()->json([
+                'message' => 'Le mot de passe actuel est incorrect.',
+            ], 422);
+        }
+
+        User::where('id', $user->id)->update([
+            'password' => Hash::make($request->new_password),
+        ]);
+
+        Profile::where('user_id', $user->id)->update([
+            'password' => Hash::make($request->new_password),
+
+        ]);
+
+        // Envoi d'une réponse de succès
+        return response()->json([
+            'message' => 'Le mot de passe a été mis à jour avec succès.',
+        ]);
+    }
+
     /**
      * Met à jour la lettre de motivation du profil utilisateur.
      */
@@ -57,28 +91,33 @@ class UserProfileController extends Controller
 
         // Validation des données envoyées dans la requête
         $request->validate([
-            'cover_letter' => 'required|mimes:pdf|max:1024',
+            'cover_letter' => 'required|file|max:1024|mimes:pdf',
         ]);
 
         try {
             // Supprime l'ancienne lettre de motivation le cas échéant
             $oldCoverLetter = Profile::where('user_id', $user_id)->value('cover_letter');
             if ($oldCoverLetter) {
+                // Supprimer l'ancienne lettre si nécessaire
                 Storage::delete($oldCoverLetter);
             }
 
-            // Stocke la nouvelle lettre de motivation dans le système de fichiers
-            $coverLetter = $request->file('cover_letter')->store('public/files');
-            // Met à jour le chemin de la lettre de motivation dans la base de données
+            // Récupère le fichier de la lettre de motivation
+            $coverLetter = $request->file('cover_letter');
+
+            // Stocke le contenu du fichier PDF dans la base de données
+            $coverLetterContent = file_get_contents($coverLetter->path());
+
+            // Met à jour le contenu de la lettre de motivation dans la base de données
             Profile::where('user_id', $user_id)->update([
-                'cover_letter' => $coverLetter,
+                'cover_letter' => $coverLetterContent,
             ]);
 
             // Retourne une réponse JSON avec un message de succès
             return response()->json(['message' => 'Lettre de motivation mise à jour avec succès.'], 200);
         } catch (\Exception $e) {
             // Retourne une réponse JSON avec un message d'erreur en cas d'échec
-            return response()->json(['error' => 'Une erreur s\'est produite lors du téléchargement du fichier.'], 500);
+            return response()->json(['error' => 'Une erreur s\'est produite lors de la mise à jour de la lettre de motivation.'], 500);
         }
     }
 
