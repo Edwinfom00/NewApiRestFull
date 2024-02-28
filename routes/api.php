@@ -63,7 +63,8 @@ Route::middleware('auth:sanctum')->group(function () {
 // Company Routes
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/companies', [CompanyController::class, 'index'])->name('companies.index');
-    Route::post('/companies', [CompanyController::class, 'store'])->name('companies.store');
+    Route::post('/companies/create', [CompanyController::class, 'store'])->name('companies.store');
+    Route::put('/companies/updatepassword', [CompanyController::class, 'updatePassword'])->name('companies.updatepassword');
     Route::put('/companies/{id}', [CompanyController::class, 'update'])->name('companies.update');
     Route::delete('/companies/{id}', [CompanyController::class, 'destroy'])->name('companies.destroy');
     Route::get('/companies/{id}', [CompanyController::class, 'show'])->name('companies.show');

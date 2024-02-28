@@ -14,15 +14,14 @@ return new class extends Migration
         Schema::create('companies', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-            $table->string('cname');
-            $table->string('slug');
-            $table->string('address');
-            $table->string('phone');
-            $table->string('website');
-            $table->string('logo');
-            $table->string('banner');
-            $table->string('slogan');
-            $table->text('description');
+            $table->string('cname')->nullable();
+            $table->string('address')->nullable();
+            $table->string('phone')->nullable();
+            $table->string('website')->nullable();
+            $table->string('logo')->nullable();
+            $table->string('banner')->nullable();
+            $table->string('slogan')->nullable();
+            $table->text('description')->nullable();
             $table->timestamps();
         });
     }

@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Company;
 use App\Models\Intern;
+use App\Models\Profile;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class CompanyController extends Controller
@@ -74,6 +76,38 @@ class CompanyController extends Controller
         ]);
 
         return response()->json(['message' => 'Informations de l\'entreprise mises à jour avec succès.'], 200);
+    }
+
+    public function updatePassword(Request $request)
+    {
+        $user = auth()->user();
+
+        // Validation des champs
+        $request->validate([
+            'current_password' => 'required|string|min:8',
+            'new_password' => 'required|string|min:8',
+        ]);
+
+        // Vérification de l'ancien mot de passe
+        if (! Hash::check($request->current_password, $user->password)) {
+            return response()->json([
+                'message' => 'Le mot de passe actuel est incorrect.',
+            ], 422);
+        }
+
+        User::where('id', $user->id)->update([
+            'password' => Hash::make($request->new_password),
+        ]);
+
+        Profile::where('user_id', $user->id)->update([
+            'password' => Hash::make($request->new_password),
+
+        ]);
+
+        // Envoi d'une réponse de succès
+        return response()->json([
+            'message' => 'Le mot de passe a été mis à jour avec succès.',
+        ]);
     }
 
     /**

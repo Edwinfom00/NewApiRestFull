@@ -54,7 +54,7 @@ class InternController extends Controller
             'title' => request('title'),
             'slug' => Str::slug(request('title')),
             'description' => request('description'),
-            'roles' => request('roles'),
+            'roles' => request('roles'), // to define the competence of the user where postuled
             'category_id' => request('category'),
             'position' => request('position'),
             'address' => request('address'),
