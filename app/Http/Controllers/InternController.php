@@ -14,28 +14,28 @@ use Illuminate\Support\Str;
 
 class InternController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware(['employer', 'verified'], ['except' => ['index', 'show', 'apply', 'allInterns', 'category', 'searchInterns']]);
-    }
+    // public function __construct()
+    // {
+    //     $this->middleware(['employer', 'verified'], ['except' => ['index', 'show', 'apply', 'allInterns', 'category', 'searchInterns']]);
+    // }
 
     /**
      * Afficher une liste des ressources.
      */
     public function index()
     {
-        $interns = Intern::latest()->limit(15)->where('status', 1)->get();
-        $companies = Company::inRandomOrder()->take(12)->get();
-        $posts = Post::where('status', 1)->get();
-        $testimonial = Testimonial::where('status', 1)->first();
-        $categories = Category::has('interns')->where('status', 1)->get();
+        $interns = Intern::orderBy('created_at', 'desc')->paginate(25);
+        // $companies = Company::inRandomOrder()->take(12)->get();
+        // $posts = Post::where('status', 1)->get();
+        // $testimonial = Testimonial::where('status', 1)->first();
+        $categories = Category::has('interns')->orderBy('created_at', 'desc')->paginate(25);
 
         return response()->json([
-            'interns' => $interns,
-            'companies' => $companies,
-            'posts' => $posts,
-            'testimonial' => $testimonial,
-            'categories' => $categories,
+            $interns,
+            // 'companies' => $companies,
+            // 'posts' => $posts,
+            // 'testimonial' => $testimonial,
+            // 'categories' => $categories,
         ], 200);
     }
 
@@ -63,7 +63,7 @@ class InternController extends Controller
             'last_date' => request('last_date'),
         ]);
 
-        return response()->json(['message' => 'Internship posted Successfully.', 'data' => $intern], 201);
+        return response()->json(['message' => 'Internship posted Successfully.', $intern], 201);
     }
 
     /**

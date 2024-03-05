@@ -39,13 +39,10 @@ Route::post('/email/resend', [VerificationController::class, 'resend'])->name('v
 //Route to manage Intern
 Route::middleware('auth:sanctum')->group(function () {
     // Home Routes
-    Route::get('/', [InternController::class, 'index']);
-    Route::get('/home', [InternController::class, 'index'])->name('home');
 
     Route::post('/interns', [InternController::class, 'store'])->name('intern.store');
     Route::put('/interns/{id}', [InternController::class, 'update'])->name('intern.update');
     Route::delete('/interns/{id}', [InternController::class, 'destroy'])->name('intern.destroy');
-    Route::get('/interns/{id}', [InternController::class, 'show'])->name('intern.show');
 
     // Applicant
     Route::post('/applications/{id}', [InternController::class, 'apply'])->name('apply');
@@ -58,7 +55,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/user/profile/coverletter', [UserProfileController::class, 'updateCoverLetter'])->name('user.profile.coverletter');
     Route::put('/user/profile/resume', [UserProfileController::class, 'updateResume'])->name('user.profile.resume');
     Route::put('/user/profile/avatar', [UserProfileController::class, 'updateAvatar'])->name('user.profile.avatar');
+
+    Route::post('user/apply', [InternController::class, 'apply'])->name('user.apply');
 });
+
+// intern
+Route::get('/', [InternController::class, 'index']);
+Route::get('/home', [InternController::class, 'index'])->name('home');
+Route::get('/interns/{id}', [InternController::class, 'show'])->name('intern.show');
 
 // Company Routes
 Route::middleware('auth:sanctum')->group(function () {
@@ -72,6 +76,6 @@ Route::middleware('auth:sanctum')->group(function () {
 
 //Favorite Routes
 Route::middleware('auth:sanctum')->group(function () {
-    Route::post('/interns/{id}', [FavoriteController::class, 'saveIntern']);
-    Route::delete('/interns/{id}', [FavoriteController::class, 'unsaveIntern']);
+    Route::post('/interns/favorite/{id}', [FavoriteController::class, 'saveIntern']);
+    Route::delete('/interns/unfavorite/{id}', [FavoriteController::class, 'unsaveIntern']);
 });

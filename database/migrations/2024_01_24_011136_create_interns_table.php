@@ -27,6 +27,7 @@ return new class extends Migration
             // ['fulltime','parttime','contract','internship'];
             $table->integer('status')->nullable();
             $table->date('last_date');
+            $table->softDeletes();
             $table->timestamps();
         });
     }
