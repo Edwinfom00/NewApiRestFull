@@ -1,9 +1,11 @@
 <?php
 
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\InternController;
 use App\Http\Controllers\LoginController;
+use App\Http\Controllers\ProviderController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\ResetPasswordController;
 use App\Http\Controllers\UserProfileController;
@@ -31,6 +33,10 @@ Route::post('/register', [RegisterController::class, 'register'])->name('registe
 Route::post('/login', [LoginController::class, 'login'])->name('login');
 Route::post('/login/google', [LoginController::class, 'loginWithGoogle'])->name('login.google');
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+
+Route::get('/auth/google/redirect', [ProviderController::class, 'redirect']);
+Route::get('/auth/{provider}/callback', [ProviderController::class, 'callback']);
+
 Route::post('/resetpassword', [ResetPasswordController::class, 'sendResetLinkEmail'])->name('sendreset');
 Route::post('/resetpassword', [ResetPasswordController::class, 'reset'])->name('resetpassword');
 Route::get('/email/verify', [VerificationController::class, 'verify'])->name('verification.verify');
@@ -52,17 +58,24 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/user/profile/update', [UserProfileController::class, 'update'])->name('user.profile.update');
     Route::put('/user/profile/password', [UserProfileController::class, 'updatePassword'])->name('user.profile.update');
 
-    Route::put('/user/profile/coverletter', [UserProfileController::class, 'updateCoverLetter'])->name('user.profile.coverletter');
+    Route::post('/user/profile/coverletter', [UserProfileController::class, 'updateCoverLetter'])->name('user.profile.coverletter');
+
     Route::put('/user/profile/resume', [UserProfileController::class, 'updateResume'])->name('user.profile.resume');
     Route::put('/user/profile/avatar', [UserProfileController::class, 'updateAvatar'])->name('user.profile.avatar');
 
-    Route::post('user/apply', [InternController::class, 'apply'])->name('user.apply');
+    // Route::post('user/apply/{id}', [InternController::class, 'apply'])->name('user.apply');
+    Route::get('/category', [CategoryController::class, 'index'])->name('category');
+    Route::post('/category/store', [CategoryController::class, 'store'])->name('category.store');
+    Route::put('/category/update', [CategoryController::class, 'update'])->name('category.update');
+    Route::delete('/category/delete', [CategoryController::class, 'destroy'])->name('category.destroy');
+
 });
 
 // intern
 Route::get('/', [InternController::class, 'index']);
 Route::get('/home', [InternController::class, 'index'])->name('home');
 Route::get('/interns/{id}', [InternController::class, 'show'])->name('intern.show');
+Route::get('/search', [InternController::class, 'searchInterns']);
 
 // Company Routes
 Route::middleware('auth:sanctum')->group(function () {

@@ -24,7 +24,7 @@ class InternFormRequest extends FormRequest
         return [
             'title' => ['required', 'max:150'],
             'position' => ['required', 'max:255'],
-            'description' => ['required', 'max:5000'],
+            'description' => ['required', 'min:30', 'max:5000'],
             'roles' => ['required', 'max:800'],
             'position' => ['required', 'string', 'max:50'],
             'address' => ['required', 'max:500'],

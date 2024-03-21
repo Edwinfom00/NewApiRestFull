@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Profile;
 use App\Models\User;
+use File;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
@@ -89,37 +90,76 @@ class UserProfileController extends Controller
     {
         $user_id = auth()->user()->id;
 
-        // Validation des données envoyées dans la requête
         $request->validate([
-            'cover_letter' => 'required|file|max:1024|mimes:pdf',
+            'cover_letter' => 'required|file|mimes:pdf|max:2048',
         ]);
 
         try {
-            // Supprime l'ancienne lettre de motivation le cas échéant
-            $oldCoverLetter = Profile::where('user_id', $user_id)->value('cover_letter');
-            if ($oldCoverLetter) {
-                // Supprimer l'ancienne lettre si nécessaire
-                Storage::delete($oldCoverLetter);
+            // Delete the old cover letter if it exists
+            $profile = Profile::where('user_id', $user_id)->first();
+            if ($profile && Storage::exists($profile->cover_letter)) {
+                Storage::delete($profile->cover_letter);
             }
 
-            // Récupère le fichier de la lettre de motivation
-            $coverLetter = $request->file('cover_letter');
+            // Store the new cover letter
+            $coverLetterPath = $request->file('cover_letter')->store('public/cover_letters');
 
-            // Stocke le contenu du fichier PDF dans la base de données
-            $coverLetterContent = file_get_contents($coverLetter->path());
+            // Update the user's profile with the new cover letter path
+            $profile->cover_letter = $coverLetterPath;
+            $profile->save();
 
-            // Met à jour le contenu de la lettre de motivation dans la base de données
-            Profile::where('user_id', $user_id)->update([
-                'cover_letter' => $coverLetterContent,
-            ]);
-
-            // Retourne une réponse JSON avec un message de succès
-            return response()->json(['message' => 'Lettre de motivation mise à jour avec succès.'], 200);
+            // Return a JSON response with a success message
+            return response()->json(['message' => 'Cover letter updated successfully.'], 200);
         } catch (\Exception $e) {
-            // Retourne une réponse JSON avec un message d'erreur en cas d'échec
-            return response()->json(['error' => 'Une erreur s\'est produite lors de la mise à jour de la lettre de motivation.'], 500);
+            // Log the error for debugging purposes
+            Log::error($e);
+
+            // Return a JSON response with an error message
+            return response()->json(['error' => 'An error occurred while uploading the file.'], 500);
         }
     }
+    // public function updateCoverLetter(Request $request)
+    // {
+    //     // // $user_id = auth()->user()->id;
+
+    //     // $result = $request->file('file')->store('coverLetter');
+
+    //     // $filePath = Storage::disk('public')->path($result);
+
+    //     // return ['result' => $result, 'filePath' => $filePath];
+
+    //     // Profile::where('user_id', $user_id)->update(['cover_letter' => $result]);
+
+    //     // return response()->json(['message' => 'Lettre de motivation mise à jour avec succès.'], 200);
+    //     $user_id = auth()->user()->id;
+    //     $validate = Validator::make($request->all(),
+    //         [
+    //             'cover_letter' => 'required|file|max:1024|mimes:pdf',
+    //         ]);
+    //     if ($validate->fails()) {
+    //         return response()->json(['error' => $validate->errors()], 422);
+    //     }
+    //     $oldCoverLetter = Profile::where('user_id', $user_id)->value('cover_letter');
+    //     if ($request->hasFile('cover_letter')) {
+    //         if ($oldCoverLetter) {
+    //             $old_path = public_path().'uploads/cover_letter'.$user->cover_letter;
+    //             if (File::exists($old_path)) {
+    //                 File::delete($old_path);
+    //             }
+    //         }
+    //         $cover_letter_name ='cover-letter-'.time().'.'.$request->cover_letter->extension();
+    //         $request->cover_letter->move(public_path('uploads/cover_letter'), $cover_letter_name);
+
+    //     }else{
+    //         $cover_letter_name = $user->cover_letter;
+    //     }
+
+    //     $user->update([
+    //         'cover_letter' => $cover_letter_name,
+    //     ]);
+    //     return response()->json(['message' => 'Lettre de motivation mise à jour avec succès.'], 200);
+
+    // }
 
     // Méthodes similaires pour la mise à jour du CV, de l'avatar et d'autres fonctionnalités...
 

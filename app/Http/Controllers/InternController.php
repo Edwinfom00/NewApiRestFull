@@ -28,7 +28,6 @@ class InternController extends Controller
         // $companies = Company::inRandomOrder()->take(12)->get();
         // $posts = Post::where('status', 1)->get();
         // $testimonial = Testimonial::where('status', 1)->first();
-        $categories = Category::has('interns')->orderBy('created_at', 'desc')->paginate(25);
 
         return response()->json([
             $interns,
@@ -101,7 +100,7 @@ class InternController extends Controller
 
         $internRecommendation = $this->internRecommendation($intern);
 
-        return response()->json(compact('intern', 'internRecommendation'), 200);
+        return response()->json([$intern], 200);
     }
 
     public function internRecommendation($intern)
@@ -184,11 +183,51 @@ class InternController extends Controller
     public function apply(Request $request, $id)
     {
         $intern = Intern::findOrFail($id);
+
+        // Vérifiez si l'utilisateur a déjà postulé.
+        if ($intern->users()->where('users.id', Auth::user()->id)->exists()) {
+            return response()->json(['message' => 'You have already applied to this internship.'], 400);
+        }
+
+        // Vérifiez si le nombre maximum de places a été atteint.
+        $maxPlaces = $intern->max_places; // Assurez-vous que $intern a un attribut max_places.
+        $currentApplications = $intern->users()->count();
+
+        if ($currentApplications >= $maxPlaces) {
+            return response()->json(['message' => 'No places left for this internship.'], 400);
+        }
+
+        // Attacher l'utilisateur seulement si les vérifications ci-dessus échouent.
         $intern->users()->attach(Auth::user()->id);
 
         return response()->json(['message' => 'Internship applied Successfully.'], 200);
-
     }
+    // public function apply(Request $request, $id)
+    // {
+    //     try {
+    //         $intern = Intern::findOrFail($id);
+
+    //         // Vérifiez si l'utilisateur a déjà postulé.
+    //         if ($intern->users()->where('id', Auth::user()->id)->exists()) {
+    //             throw new Exception('Vous avez déjà postulé à ce stage.');
+    //         }
+
+    //         // Vérifiez si le nombre maximum de places a été atteint.
+    //         $maxPlaces = $intern->max_places; // Assurez-vous que $intern a un attribut max_places.
+    //         $currentApplications = $intern->users()->count();
+
+    //         if ($currentApplications >= $maxPlaces) {
+    //             throw new Exception('Plus de places disponibles pour ce stage.');
+    //         }
+
+    //         // Attacher l'utilisateur
+    //         $intern->users()->attach(Auth::user()->id);
+
+    //         return response()->json(['message' => 'Candidature au stage réussie.'], 200);
+    //     } catch (Exception $e) {
+    //         return response()->json(['message' => $e->getMessage()], 400);
+    //     }
+    // }
 
     // Méthode de récupération des candidats pour un stage
     public function applicant()
@@ -198,16 +237,26 @@ class InternController extends Controller
         return response()->json(compact('applicants'), 200);
     }
 
-    // Recherche de stages
     public function searchInterns(Request $request)
     {
-        $keyword = $request->get('keyword');
-        $interns = Intern::where('title', 'like', '%'.$keyword.'%')
-            ->orWhere('position', 'like', '%'.$keyword.'%')
-            ->orWhere('address', 'like', '%'.$keyword.'%')
-            ->get();
+        // $keyword = $request->get('keyword');
+        // $interns = Intern::where('title', 'like', '%'.$keyword.'%')
+        //     ->orWhere('position', 'like', '%'.$keyword.'%')
+        //     ->orWhere('address', 'like', '%'.$keyword.'%')
+        //     ->get();
 
-        return response()->json(compact('interns'), 200);
+        // return response()->json(compact('interns'), 200);
+        $query = Intern::query();
+        $data = $request->input('search_interns');
+
+        if ($data) {
+            $escapedData = addslashes($data); // Échapper les apostrophes simples dans la chaîne de recherche
+            $query->whereRaw("title LIKE '%".$escapedData."%'")
+                ->orWhereRaw("position LIKE '%".$escapedData."%'")
+                ->orWhereRaw("address LIKE '%".$escapedData."%'");
+        }
+
+        return $query->get();
     }
 
     // Activer/désactiver un stage
