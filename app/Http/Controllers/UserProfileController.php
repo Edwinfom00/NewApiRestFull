@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Profile;
 use App\Models\User;
 use File;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
@@ -86,38 +87,6 @@ class UserProfileController extends Controller
     /**
      * Met à jour la lettre de motivation du profil utilisateur.
      */
-    public function updateCoverLetter(Request $request)
-    {
-        $user_id = auth()->user()->id;
-
-        $request->validate([
-            'cover_letter' => 'required|file|mimes:pdf|max:2048',
-        ]);
-
-        try {
-            // Delete the old cover letter if it exists
-            $profile = Profile::where('user_id', $user_id)->first();
-            if ($profile && Storage::exists($profile->cover_letter)) {
-                Storage::delete($profile->cover_letter);
-            }
-
-            // Store the new cover letter
-            $coverLetterPath = $request->file('cover_letter')->store('public/cover_letters');
-
-            // Update the user's profile with the new cover letter path
-            $profile->cover_letter = $coverLetterPath;
-            $profile->save();
-
-            // Return a JSON response with a success message
-            return response()->json(['message' => 'Cover letter updated successfully.'], 200);
-        } catch (\Exception $e) {
-            // Log the error for debugging purposes
-            Log::error($e);
-
-            // Return a JSON response with an error message
-            return response()->json(['error' => 'An error occurred while uploading the file.'], 500);
-        }
-    }
     // public function updateCoverLetter(Request $request)
     // {
     //     // // $user_id = auth()->user()->id;
@@ -160,6 +129,48 @@ class UserProfileController extends Controller
     //     return response()->json(['message' => 'Lettre de motivation mise à jour avec succès.'], 200);
 
     // }
+    protected function sendError($message, $code = 404): JsonResponse
+    {
+        return response()->json(['error' => $message], $code);
+    }
+
+    public function uploadcoverletter(Request $request)
+    {
+        $user_id = auth()->user()->id;
+        try {
+            $file = $request->file('cover_letter');
+            if (! empty($file)) {
+                $uploadPath = 'public/'.$file->getClientOriginalName().'/cover_letter';
+            } else {
+                $uploadPath = 'public/cover_letter';
+            }
+            $originalImage = $file->getClientOriginalName();
+            $re = $file->move($uploadPath, $originalImage);
+            Profile::where('user_id', $user_id)->update(['cover_letter' => $re->getPathname()]);
+
+            return response()->json(['cover_letter' => $re->getPathname()]);
+        } catch (\Throwable $th) {
+            $this->sendError($th->getMessage());
+        }
+    }
+
+    public function uploadphotos(Request $request)
+    {
+        try {
+            $file = $request->file('cover_letter');
+            if (! empty($request['chemin'])) {
+                $uploadPath = 'public/'.$request['chemin'].'/profil';
+            } else {
+                $uploadPath = 'public/profil';
+            }
+            $originalImage = $file->getClientOriginalName();
+            $re = $file->move($uploadPath, $originalImage);
+
+            return response()->json(['chemin' => $re->getPathname()]);
+        } catch (\Throwable $th) {
+            $this->sendError($th->getMessage());
+        }
+    }
 
     // Méthodes similaires pour la mise à jour du CV, de l'avatar et d'autres fonctionnalités...
 

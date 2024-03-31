@@ -55,11 +55,16 @@ class InternController extends Controller
             'description' => request('description'),
             'roles' => request('roles'), // to define the competence of the user where postuled
             'category_id' => request('category'),
+            'company_name' => request('company_name'),
+            'company_website' => request('company_website'),
+            'company_location' => request('company_location'),
             'position' => request('position'),
             'address' => request('address'),
             'type' => request('type'),
             'status' => request('status'),
             'last_date' => request('last_date'),
+            'start_date' => request('start_date'),
+            'end_date' => request('end_date'),
         ]);
 
         return response()->json(['message' => 'Internship posted Successfully.', $intern], 201);

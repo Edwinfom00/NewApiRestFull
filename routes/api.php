@@ -58,10 +58,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::put('/user/profile/update', [UserProfileController::class, 'update'])->name('user.profile.update');
     Route::put('/user/profile/password', [UserProfileController::class, 'updatePassword'])->name('user.profile.update');
 
-    Route::post('/user/profile/coverletter', [UserProfileController::class, 'updateCoverLetter'])->name('user.profile.coverletter');
+    Route::post('/user/profile/coverletter', [UserProfileController::class, 'uploadphotos'])->name('user.profile.coverletter');
 
     Route::put('/user/profile/resume', [UserProfileController::class, 'updateResume'])->name('user.profile.resume');
-    Route::put('/user/profile/avatar', [UserProfileController::class, 'updateAvatar'])->name('user.profile.avatar');
 
     // Route::post('user/apply/{id}', [InternController::class, 'apply'])->name('user.apply');
     Route::get('/category', [CategoryController::class, 'index'])->name('category');
@@ -76,6 +75,7 @@ Route::get('/', [InternController::class, 'index']);
 Route::get('/home', [InternController::class, 'index'])->name('home');
 Route::get('/interns/{id}', [InternController::class, 'show'])->name('intern.show');
 Route::get('/search', [InternController::class, 'searchInterns']);
+Route::put('/user/profile/avatar', [UserProfileController::class, 'updateAvatar'])->name('user.profile.avatar');
 
 // Company Routes
 Route::middleware('auth:sanctum')->group(function () {

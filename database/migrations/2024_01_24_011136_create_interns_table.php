@@ -22,11 +22,16 @@ return new class extends Migration
             $table->integer('category_id')->nullable();
             $table->string('position');
             $table->string('address');
-            $table->integer('featured')->nullable();
+            $table->string('company_name')->nullable();
+            $table->string('company_website')->nullable();
+            $table->string('company_location')->nullable();
             $table->string('type')->nullable();
             // ['fulltime','parttime','contract','internship'];
             $table->integer('status')->nullable();
             $table->date('last_date');
+            $table->date('start_date');
+            $table->date('end_date')->nullable();
+
             $table->softDeletes();
             $table->timestamps();
         });
