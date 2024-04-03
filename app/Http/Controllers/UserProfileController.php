@@ -4,8 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Profile;
 use App\Models\User;
-use File;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
@@ -87,88 +85,21 @@ class UserProfileController extends Controller
     /**
      * Met à jour la lettre de motivation du profil utilisateur.
      */
-    // public function updateCoverLetter(Request $request)
-    // {
-    //     // // $user_id = auth()->user()->id;
-
-    //     // $result = $request->file('file')->store('coverLetter');
-
-    //     // $filePath = Storage::disk('public')->path($result);
-
-    //     // return ['result' => $result, 'filePath' => $filePath];
-
-    //     // Profile::where('user_id', $user_id)->update(['cover_letter' => $result]);
-
-    //     // return response()->json(['message' => 'Lettre de motivation mise à jour avec succès.'], 200);
-    //     $user_id = auth()->user()->id;
-    //     $validate = Validator::make($request->all(),
-    //         [
-    //             'cover_letter' => 'required|file|max:1024|mimes:pdf',
-    //         ]);
-    //     if ($validate->fails()) {
-    //         return response()->json(['error' => $validate->errors()], 422);
-    //     }
-    //     $oldCoverLetter = Profile::where('user_id', $user_id)->value('cover_letter');
-    //     if ($request->hasFile('cover_letter')) {
-    //         if ($oldCoverLetter) {
-    //             $old_path = public_path().'uploads/cover_letter'.$user->cover_letter;
-    //             if (File::exists($old_path)) {
-    //                 File::delete($old_path);
-    //             }
-    //         }
-    //         $cover_letter_name ='cover-letter-'.time().'.'.$request->cover_letter->extension();
-    //         $request->cover_letter->move(public_path('uploads/cover_letter'), $cover_letter_name);
-
-    //     }else{
-    //         $cover_letter_name = $user->cover_letter;
-    //     }
-
-    //     $user->update([
-    //         'cover_letter' => $cover_letter_name,
-    //     ]);
-    //     return response()->json(['message' => 'Lettre de motivation mise à jour avec succès.'], 200);
-
-    // }
-    protected function sendError($message, $code = 404): JsonResponse
+    public function updateCoverLetter(Request $request)
     {
-        return response()->json(['error' => $message], $code);
-    }
-
-    public function uploadcoverletter(Request $request)
-    {
+        $profile = new Profile;
         $user_id = auth()->user()->id;
-        try {
-            $file = $request->file('cover_letter');
-            if (! empty($file)) {
-                $uploadPath = 'public/'.$file->getClientOriginalName().'/cover_letter';
-            } else {
-                $uploadPath = 'public/cover_letter';
-            }
-            $originalImage = $file->getClientOriginalName();
-            $re = $file->move($uploadPath, $originalImage);
-            Profile::where('user_id', $user_id)->update(['cover_letter' => $re->getPathname()]);
 
-            return response()->json(['cover_letter' => $re->getPathname()]);
-        } catch (\Throwable $th) {
-            $this->sendError($th->getMessage());
-        }
-    }
+        if ($request->hasFile('cover_letter')) {
+            $completeFileName = $request->file('cover_letter')->getClientOriginalName();
+            $fileNameOnly = pathinfo($completeFileName, PATHINFO_FILENAME);
+            $extension = $request->file('cover_letter')->getClientOriginalExtension();
+            $compic = str_replace('', '_', $fileNameOnly).'-'.rand().'_'.time().'.'.$extension;
+            $path = $request->file('cover_letter')->storeAs('public/cover_letter', $compic);
 
-    public function uploadphotos(Request $request)
-    {
-        try {
-            $file = $request->file('cover_letter');
-            if (! empty($request['chemin'])) {
-                $uploadPath = 'public/'.$request['chemin'].'/profil';
-            } else {
-                $uploadPath = 'public/profil';
-            }
-            $originalImage = $file->getClientOriginalName();
-            $re = $file->move($uploadPath, $originalImage);
+            $profile->cover_letter = $profile::where('user_id', $user_id)->update(['cover_letter' => $compic]);
 
-            return response()->json(['chemin' => $re->getPathname()]);
-        } catch (\Throwable $th) {
-            $this->sendError($th->getMessage());
+            return response()->json(['cover_letter' => $compic, 'user_id' => $user_id, 'message' => 'mis a jour avec success']);
         }
     }
 

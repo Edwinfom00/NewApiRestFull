@@ -29,12 +29,11 @@ class LoginController extends Controller
 
     public function logout(Request $request)
     {
-        // Revoke user's API token
-        $request->user()->token()->revoke();
+        if (Auth::check()) {
+            $request->user()->tokens()->delete(); // Supprimer tous les jetons d'accès de l'utilisateur
+        }
 
-        session()->forget('user_id');
-
-        return response()->json(['message' => 'User logged out successfully'], 200);
+        return response()->json(['message' => 'L\'utilisateur s\'est déconnecté avec succès'], 200);
     }
 
     public function loginWithGoogle(Request $request)
