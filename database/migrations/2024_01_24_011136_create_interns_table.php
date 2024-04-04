@@ -26,12 +26,11 @@ return new class extends Migration
             $table->string('company_website')->nullable();
             $table->string('company_location')->nullable();
             $table->string('type')->nullable();
-            // ['fulltime','parttime','contract','internship'];
             $table->integer('status')->nullable();
             $table->date('last_date');
             $table->date('start_date');
             $table->date('end_date')->nullable();
-
+            $table->integer('max_places')->nullable();
             $table->softDeletes();
             $table->timestamps();
         });

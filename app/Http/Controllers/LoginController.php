@@ -21,10 +21,11 @@ class LoginController extends Controller
             return response()->json([
                 'user' => $user,
                 'access_token' => $token,
+                'message' => 'connecté avec succès',
             ], 200);
         }
 
-        return response()->json(['error' => 'Invalid credentials'], 401);
+        return response()->json(['error' => 'les informations d\'identification invalides'], 401);
     }
 
     public function logout(Request $request)
